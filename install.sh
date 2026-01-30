@@ -37,6 +37,7 @@ sudo chmod 755 "$PREFIX/bin/lincheckroot"
 # Install data files
 echo "[*] Installing data files..."
 sudo cp "$PROJECT_DIR/data/lineage_devices.json" "$PREFIX/share/lincheckroot/"
+sudo cp "$PROJECT_DIR/data/style.css" "$PREFIX/share/lincheckroot/"
 
 # Create desktop entry
 echo "[*] Creating desktop entry..."

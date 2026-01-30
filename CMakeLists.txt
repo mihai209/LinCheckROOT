@@ -46,3 +46,4 @@ target_compile_options(lincheckroot PRIVATE ${JSON_CFLAGS_OTHER})
 
 # Install data files
 install(FILES data/lineage_devices.json DESTINATION share/lincheckroot)
+install(FILES data/style.css DESTINATION share/lincheckroot)

@@ -199,111 +199,208 @@ extern "C" void on_quit(GtkButton* button, gpointer user_data)
     gtk_window_close(GTK_WINDOW(app_state->main_window));
 }
 
+// Load and apply CSS styling
+static void apply_custom_css(GtkApplication* app)
+{
+    GtkCssProvider* provider = gtk_css_provider_new();
+    const char* css_locations[] = {
+        "/usr/share/lincheckroot/style.css",
+        "/usr/local/share/lincheckroot/style.css",
+        "./data/style.css",
+        NULL
+    };
+
+    for (size_t i = 0; css_locations[i] != NULL; ++i) {
+        if (g_file_test(css_locations[i], G_FILE_TEST_EXISTS)) {
+            gtk_css_provider_load_from_path(provider, css_locations[i]);
+            gtk_style_context_add_provider_for_display(
+                gdk_display_get_default(),
+                GTK_STYLE_PROVIDER(provider),
+                GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+            break;
+        }
+    }
+    g_object_unref(provider);
+}
+
 // Build the GUI
 static GtkWidget* build_gui(GtkApplication* app)
 {
-    // Main window
+    // Apply custom CSS styling
+    apply_custom_css(app);
+
+    // Main window with modern title bar
     GtkWidget* window = gtk_application_window_new(app);
-    gtk_window_set_default_size(GTK_WINDOW(window), 900, 700);
-    gtk_window_set_title(GTK_WINDOW(window), "LinCheckROOT - Android Device Analyzer");
+    gtk_window_set_default_size(GTK_WINDOW(window), 1000, 750);
+    gtk_window_set_title(GTK_WINDOW(window), "LinCheckROOT");
+    gtk_window_set_icon_name(GTK_WINDOW(window), "lincheckroot");
+    gtk_window_set_resizable(GTK_WINDOW(window), TRUE);
 
     app_state->main_window = window;
 
     // Main container
-    GtkWidget* main_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
-    gtk_widget_set_margin_top(main_box, 10);
-    gtk_widget_set_margin_bottom(main_box, 10);
-    gtk_widget_set_margin_start(main_box, 10);
-    gtk_widget_set_margin_end(main_box, 10);
+    GtkWidget* main_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_widget_add_css_class(main_box, "main");
 
-    // Top control panel
-    GtkWidget* control_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+    // Header bar with title
+    GtkWidget* header_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 15);
+    gtk_widget_add_css_class(header_box, "header");
+    gtk_widget_set_margin_top(header_box, 12);
+    gtk_widget_set_margin_bottom(header_box, 12);
+    gtk_widget_set_margin_start(header_box, 15);
+    gtk_widget_set_margin_end(header_box, 15);
 
-    // ADB path input
+    GtkWidget* title_label = gtk_label_new("Android Device Analyzer");
+    gtk_widget_add_css_class(title_label, "title");
+    gtk_label_set_xalign(GTK_LABEL(title_label), 0.0);
+    gtk_box_append(GTK_BOX(header_box), title_label);
+    gtk_box_set_homogeneous(GTK_BOX(header_box), FALSE);
+    gtk_box_append(GTK_BOX(main_box), header_box);
+
+    // Separator
+    GtkWidget* sep1 = gtk_separator_new(GTK_ORIENTATION_HORIZONTAL);
+    gtk_box_append(GTK_BOX(main_box), sep1);
+
+    // Top control panel - now more organized
+    GtkWidget* control_panel = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
+    gtk_widget_add_css_class(control_panel, "section");
+    gtk_widget_set_margin_top(control_panel, 12);
+    gtk_widget_set_margin_bottom(control_panel, 12);
+    gtk_widget_set_margin_start(control_panel, 15);
+    gtk_widget_set_margin_end(control_panel, 15);
+
+    // ADB Path row
+    GtkWidget* adb_row = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+    gtk_box_set_homogeneous(GTK_BOX(adb_row), FALSE);
     GtkWidget* adb_label = gtk_label_new("ADB Path:");
+    gtk_label_set_xalign(GTK_LABEL(adb_label), 0.0);
+    gtk_widget_set_size_request(adb_label, 100, -1);
+    gtk_box_append(GTK_BOX(adb_row), adb_label);
+    
     app_state->adb_path_entry = gtk_entry_new();
     gtk_editable_set_text(GTK_EDITABLE(app_state->adb_path_entry), 
                           app_state->config->get("adb_path").c_str());
+    gtk_widget_set_size_request(app_state->adb_path_entry, 350, -1);
     g_signal_connect(app_state->adb_path_entry, "changed", 
                      G_CALLBACK(on_adb_path_changed), nullptr);
+    gtk_box_append(GTK_BOX(adb_row), app_state->adb_path_entry);
+    gtk_box_append(GTK_BOX(control_panel), adb_row);
 
-    gtk_box_append(GTK_BOX(control_box), adb_label);
-    gtk_box_append(GTK_BOX(control_box), app_state->adb_path_entry);
+    // Devices row
+    GtkWidget* device_row = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+    gtk_box_set_homogeneous(GTK_BOX(device_row), FALSE);
+    
+    GtkWidget* device_label = gtk_label_new("Select Device:");
+    gtk_label_set_xalign(GTK_LABEL(device_label), 0.0);
+    gtk_widget_set_size_request(device_label, 100, -1);
+    gtk_box_append(GTK_BOX(device_row), device_label);
 
-    // Scan button
-    GtkWidget* scan_button = gtk_button_new_with_label("Scan Devices");
-    g_signal_connect(scan_button, "clicked", G_CALLBACK(on_scan_devices), nullptr);
-    gtk_box_append(GTK_BOX(control_box), scan_button);
-
-    // Device selector
-    GtkWidget* device_label = gtk_label_new("Device:");
     app_state->device_list_combo = gtk_combo_box_text_new();
-    gtk_box_append(GTK_BOX(control_box), device_label);
-    gtk_box_append(GTK_BOX(control_box), app_state->device_list_combo);
+    gtk_widget_set_size_request(app_state->device_list_combo, 350, -1);
     g_signal_connect(app_state->device_list_combo, "changed", 
                      G_CALLBACK(on_device_selected), nullptr);
+    gtk_box_append(GTK_BOX(device_row), app_state->device_list_combo);
 
-    gtk_box_append(GTK_BOX(main_box), control_box);
+    GtkWidget* scan_button = gtk_button_new_with_label("🔍 Scan Devices");
+    gtk_widget_set_size_request(scan_button, 140, -1);
+    g_signal_connect(scan_button, "clicked", G_CALLBACK(on_scan_devices), nullptr);
+    gtk_box_append(GTK_BOX(device_row), scan_button);
 
-    // Refresh button
-    GtkWidget* refresh_button = gtk_button_new_with_label("Refresh Information");
+    gtk_box_append(GTK_BOX(control_panel), device_row);
+    gtk_box_append(GTK_BOX(main_box), control_panel);
+
+    // Action buttons
+    GtkWidget* button_row = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+    gtk_widget_set_margin_start(button_row, 15);
+    gtk_widget_set_margin_end(button_row, 15);
+    gtk_widget_set_margin_bottom(button_row, 12);
+
+    GtkWidget* refresh_button = gtk_button_new_with_label("🔄 Refresh Information");
+    gtk_widget_set_size_request(refresh_button, 200, -1);
     g_signal_connect(refresh_button, "clicked", G_CALLBACK(on_refresh_info), nullptr);
-    gtk_box_append(GTK_BOX(main_box), refresh_button);
+    gtk_box_append(GTK_BOX(button_row), refresh_button);
 
-    // Notebook for tabs
+    GtkWidget* quit_button = gtk_button_new_with_label("✕ Quit");
+    gtk_widget_add_css_class(quit_button, "secondary");
+    gtk_widget_set_size_request(quit_button, 100, -1);
+    g_signal_connect(quit_button, "clicked", G_CALLBACK(on_quit), nullptr);
+    gtk_box_append(GTK_BOX(button_row), quit_button);
+
+    gtk_box_append(GTK_BOX(main_box), button_row);
+
+    // Separator
+    GtkWidget* sep2 = gtk_separator_new(GTK_ORIENTATION_HORIZONTAL);
+    gtk_box_append(GTK_BOX(main_box), sep2);
+
+    // Notebook (tabs) - with better spacing
     GtkWidget* notebook = gtk_notebook_new();
+    gtk_widget_set_margin_start(notebook, 0);
+    gtk_widget_set_margin_end(notebook, 0);
+    gtk_widget_set_margin_top(notebook, 0);
+    gtk_widget_set_margin_bottom(notebook, 0);
 
-    // Device Info Tab
+    // Device Info Tab with icon
     app_state->device_info_text = gtk_text_view_new();
     gtk_text_view_set_editable(GTK_TEXT_VIEW(app_state->device_info_text), FALSE);
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(app_state->device_info_text), GTK_WRAP_WORD);
+    gtk_widget_add_css_class(app_state->device_info_text, "textview");
 
     GtkWidget* device_scroll = gtk_scrolled_window_new();
     gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(device_scroll), app_state->device_info_text);
+    gtk_scrolled_window_set_has_frame(GTK_SCROLLED_WINDOW(device_scroll), TRUE);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), device_scroll, 
-                            gtk_label_new("Device Info"));
+                            gtk_label_new("📱 Device Info"));
 
     // Root Status Tab
     app_state->root_status_text = gtk_text_view_new();
     gtk_text_view_set_editable(GTK_TEXT_VIEW(app_state->root_status_text), FALSE);
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(app_state->root_status_text), GTK_WRAP_WORD);
+    gtk_widget_add_css_class(app_state->root_status_text, "textview");
 
     GtkWidget* root_scroll = gtk_scrolled_window_new();
     gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(root_scroll), app_state->root_status_text);
+    gtk_scrolled_window_set_has_frame(GTK_SCROLLED_WINDOW(root_scroll), TRUE);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), root_scroll, 
-                            gtk_label_new("Root & Bootloader"));
+                            gtk_label_new("🔓 Root Status"));
 
     // Bootloader Status Tab
     app_state->bootloader_status_text = gtk_text_view_new();
     gtk_text_view_set_editable(GTK_TEXT_VIEW(app_state->bootloader_status_text), FALSE);
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(app_state->bootloader_status_text), GTK_WRAP_WORD);
+    gtk_widget_add_css_class(app_state->bootloader_status_text, "textview");
 
     GtkWidget* bootloader_scroll = gtk_scrolled_window_new();
     gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(bootloader_scroll), 
                                   app_state->bootloader_status_text);
+    gtk_scrolled_window_set_has_frame(GTK_SCROLLED_WINDOW(bootloader_scroll), TRUE);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), bootloader_scroll, 
-                            gtk_label_new("Bootloader"));
+                            gtk_label_new("🔒 Bootloader"));
 
     // ROM Compatibility Tab
     app_state->rom_compat_text = gtk_text_view_new();
     gtk_text_view_set_editable(GTK_TEXT_VIEW(app_state->rom_compat_text), FALSE);
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(app_state->rom_compat_text), GTK_WRAP_WORD);
+    gtk_widget_add_css_class(app_state->rom_compat_text, "textview");
 
     GtkWidget* rom_scroll = gtk_scrolled_window_new();
     gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(rom_scroll), app_state->rom_compat_text);
+    gtk_scrolled_window_set_has_frame(GTK_SCROLLED_WINDOW(rom_scroll), TRUE);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), rom_scroll, 
-                            gtk_label_new("ROM Compatibility"));
+                            gtk_label_new("🐧 ROM Compatibility"));
 
     gtk_box_append(GTK_BOX(main_box), notebook);
+    gtk_widget_set_hexpand(notebook, TRUE);
+    gtk_widget_set_vexpand(notebook, TRUE);
+
+    // Separator before status bar
+    GtkWidget* sep3 = gtk_separator_new(GTK_ORIENTATION_HORIZONTAL);
+    gtk_box_append(GTK_BOX(main_box), sep3);
 
     // Status bar
     app_state->status_bar = gtk_statusbar_new();
+    gtk_widget_add_css_class(app_state->status_bar, "statusbar");
+    gtk_statusbar_push(GTK_STATUSBAR(app_state->status_bar), 0, "Ready - Connect device and click 'Scan Devices'");
     gtk_box_append(GTK_BOX(main_box), app_state->status_bar);
-
-    // Quit button
-    GtkWidget* quit_button = gtk_button_new_with_label("Quit");
-    g_signal_connect(quit_button, "clicked", G_CALLBACK(on_quit), nullptr);
-    gtk_box_append(GTK_BOX(main_box), quit_button);
 
     // Set main container
     gtk_window_set_child(GTK_WINDOW(window), main_box);

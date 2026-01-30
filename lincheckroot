@@ -1,0 +1,34 @@
+#!/bin/bash
+# LinCheckROOT launcher - suppresses non-critical GTK warnings
+
+# Set GTK environment variables to minimize theme warnings
+export G_DEBUG=""
+export GDK_DEBUG=""
+export GTK_DEBUG=""
+export XDG_DATA_DIRS="/usr/local/share:/usr/share"
+
+# Suppress GTK settings warnings by creating dummy settings if needed
+if [ ! -f ~/.config/gtk-4.0/settings.ini ]; then
+    mkdir -p ~/.config/gtk-4.0
+    cat > ~/.config/gtk-4.0/settings.ini << 'EOF'
+[Settings]
+gtk-application-prefer-dark-theme=false
+gtk-font-name=Ubuntu 10
+gtk-primary-button-warps-slider=false
+EOF
+fi
+
+# Find and run lincheckroot binary
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Try local build first, then system paths
+if [ -f "$SCRIPT_DIR/build/lincheckroot" ]; then
+    exec "$SCRIPT_DIR/build/lincheckroot" "$@" 2>/dev/null
+elif [ -f /usr/local/bin/lincheckroot ]; then
+    exec /usr/local/bin/lincheckroot "$@" 2>/dev/null
+elif [ -f /usr/bin/lincheckroot ]; then
+    exec /usr/bin/lincheckroot "$@" 2>/dev/null
+else
+    echo "Error: lincheckroot binary not found"
+    exit 1
+fi
