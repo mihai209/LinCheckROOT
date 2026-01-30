@@ -1,82 +1,85 @@
-/* LinCheckROOT Modern Theme */
+/* LinCheckROOT Modern Dark Theme */
 
 /* Main window styling */
 window {
-    background-color: #f5f5f5;
-    color: #333333;
-    font-family: "Segoe UI", "Ubuntu", sans-serif;
+    background-color: #121212;
+    color: #e0e0e0;
+    font-family: "Inter", "Segoe UI", "Ubuntu", sans-serif;
     font-size: 10pt;
 }
 
 /* Control panel styling */
 #control-panel {
-    background-color: #ffffff;
-    border-bottom: 1px solid #e0e0e0;
+    background-color: #1e1e1e;
+    border-bottom: 1px solid #333333;
     padding: 15px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
 /* Labels */
 label {
-    color: #333333;
+    color: #b0b0b0;
     font-weight: 500;
 }
 
 label.title {
     font-size: 14pt;
-    font-weight: 600;
-    color: #1976d2;
+    font-weight: 700;
+    color: #4dabf7;
     margin: 10px 0;
 }
 
 /* Entry fields */
 entry {
-    background-color: #ffffff;
-    color: #333333;
-    border: 1px solid #d0d0d0;
-    border-radius: 6px;
+    background-color: #252525;
+    color: #ffffff;
+    border: 1px solid #404040;
+    border-radius: 8px;
     padding: 8px 12px;
     font-size: 10pt;
     min-height: 36px;
+    transition: all 0.2s ease;
 }
 
 entry:focus {
-    border: 2px solid #1976d2;
-    outline: none;
+    border-color: #4dabf7;
+    background-color: #2a2a2a;
+    box-shadow: 0 0 0 2px rgba(77, 171, 247, 0.2);
 }
 
 /* Buttons */
 button {
-    background-color: #1976d2;
+    background-color: #339af0;
     color: #ffffff;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     padding: 10px 20px;
     font-weight: 600;
     font-size: 10pt;
     min-height: 40px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 button:hover {
-    background-color: #1565c0;
-    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+    background-color: #4dabf7;
+    box-shadow: 0 4px 15px rgba(51, 154, 240, 0.4);
+    transform: translateY(-1px);
 }
 
 button:active {
-    background-color: #0d47a1;
-    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.2);
+    background-color: #228be6;
+    transform: translateY(0);
 }
 
 button:disabled {
-    background-color: #cccccc;
-    color: #999999;
+    background-color: #343a40;
+    color: #868e96;
     cursor: not-allowed;
 }
 
 button.secondary {
-    background-color: #757575;
+    background-color: #495057;
 }
 
 button.secondary:hover {
@@ -85,150 +88,104 @@ button.secondary:hover {
 
 /* Combo box */
 combobox {
-    background-color: #ffffff;
-    color: #333333;
-    border: 1px solid #d0d0d0;
-    border-radius: 6px;
+    background-color: #252525;
+    color: #ffffff;
+    border: 1px solid #404040;
+    border-radius: 8px;
     min-height: 36px;
 }
 
 /* Notebook (tabs) */
 notebook {
-    background-color: #f5f5f5;
+    background-color: #121212;
 }
 
 notebook > header {
-    background-color: #ffffff;
-    border-bottom: 1px solid #e0e0e0;
+    background-color: #1e1e1e;
+    border-bottom: 1px solid #333333;
 }
 
 notebook > header > tabs > tab {
     padding: 12px 20px;
-    background-color: #ffffff;
+    background-color: #1e1e1e;
     border-bottom: 3px solid transparent;
-    color: #666666;
+    color: #adb5bd;
     font-weight: 500;
     transition: all 0.2s ease;
 }
 
 notebook > header > tabs > tab:hover {
-    background-color: #f9f9f9;
-    color: #1976d2;
+    color: #4dabf7;
+    background-color: #252525;
 }
 
-notebook > header > tabs > tab.reorderable-page.top:checked {
-    border-bottom-color: #1976d2;
-    color: #1976d2;
-    background-color: #ffffff;
+notebook > header > tabs > tab:checked {
+    border-bottom-color: #4dabf7;
+    color: #ffffff;
+    background-color: #252525;
 }
 
-/* Text view */
+/* Text view (Code/Log style) */
 textview {
-    background-color: #ffffff;
-    color: #333333;
-    font-family: "Roboto Mono", "Courier New", monospace;
+    background-color: #000000;
+    color: #d1d1d1;
+    font-family: "JetBrains Mono", "Roboto Mono", monospace;
     font-size: 10pt;
-    padding: 12px;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
+    padding: 15px;
+    border: 1px solid #333333;
+    border-radius: 8px;
 }
 
 /* Scrolled window */
 scrolledwindow {
-    background-color: #ffffff;
+    background-color: #121212;
 }
 
 /* Status bar */
 statusbar {
-    background-color: #f0f0f0;
-    border-top: 1px solid #e0e0e0;
+    background-color: #1a1a1a;
+    border-top: 1px solid #333333;
     padding: 8px 12px;
-    color: #666666;
+    color: #868e96;
     font-size: 9pt;
 }
 
 /* Box containers */
-box {
-    spacing: 10px;
-}
-
-box.main {
-    padding: 15px;
-}
-
 box.section {
-    padding: 12px;
-    background-color: #ffffff;
-    border-radius: 6px;
+    padding: 15px;
+    background-color: #1e1e1e;
+    border-radius: 12px;
     margin-bottom: 10px;
-}
-
-/* Separator */
-separator {
-    background-color: #e0e0e0;
+    border: 1px solid #2d2d2d;
 }
 
 /* Scrollbar */
 scrollbar {
-    background-color: #f5f5f5;
+    background-color: transparent;
+    transition: all 0.3s ease;
 }
 
 scrollbar slider {
-    background-color: #c0c0c0;
-    border-radius: 4px;
-    min-width: 12px;
-    min-height: 12px;
+    background-color: #495057;
+    border-radius: 10px;
+    min-width: 8px;
+    margin: 2px;
 }
 
 scrollbar slider:hover {
-    background-color: #a0a0a0;
+    background-color: #adb5bd;
 }
 
-/* Success/Info/Warning/Error states */
-.info {
-    color: #1976d2;
-}
+/* States */
+.success { color: #63e6be; }
+.info { color: #4dabf7; }
+.warning { color: #ffd43b; }
+.error { color: #ff8787; }
 
-.success {
-    color: #388e3c;
-}
-
-.warning {
-    color: #f57c00;
-}
-
-.error {
-    color: #d32f2f;
-}
-
-/* Responsive padding */
-.padded {
-    padding: 15px;
-}
-
-.compact {
-    padding: 8px;
-}
-
-/* Tooltips */
-tooltip {
-    background-color: #333333;
-    color: #ffffff;
-    border-radius: 4px;
-    padding: 8px 12px;
-    font-size: 9pt;
-}
-
-/* Headerbar */
+/* Headerbar (Title bar) */
 headerbar {
-    background-color: #1976d2;
+    background-color: #1e1e1e;
+    border-bottom: 1px solid #333333;
     color: #ffffff;
     padding: 10px 15px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-headerbar label {
-    color: #ffffff;
-    font-weight: 600;
-    font-size: 12pt;
 }
