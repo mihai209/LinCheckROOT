@@ -1,0 +1,31 @@
+build/
+*.o
+*.a
+*.so
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+CTestTestfile.cmake
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Build artifacts
+*.deb
+*.rpm
+dist/
+*.tar.gz
+
+# Config
+.config/lincheckroot/
+
+# Compiler outputs
+*.so.*
+*.exe
+a.out

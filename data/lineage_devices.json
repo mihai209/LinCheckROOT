@@ -1,0 +1,84 @@
+{
+  "devices": [
+    {
+      "codename": "hammerhead",
+      "is_supported": true,
+      "latest_lineage_version": "19.1",
+      "maintainer": "LineageOS Community",
+      "download_url": "https://lineageos.org/devices/hammerhead/",
+      "all_versions": ["19.1", "19", "18.1", "18"]
+    },
+    {
+      "codename": "bullhead",
+      "is_supported": true,
+      "latest_lineage_version": "19.1",
+      "maintainer": "LineageOS Community",
+      "download_url": "https://lineageos.org/devices/bullhead/",
+      "all_versions": ["19.1", "19", "18.1", "18"]
+    },
+    {
+      "codename": "shamu",
+      "is_supported": true,
+      "latest_lineage_version": "17.1",
+      "maintainer": "LineageOS Community",
+      "download_url": "https://lineageos.org/devices/shamu/",
+      "all_versions": ["17.1"]
+    },
+    {
+      "codename": "mako",
+      "is_supported": true,
+      "latest_lineage_version": "16",
+      "maintainer": "LineageOS Community",
+      "download_url": "https://lineageos.org/devices/mako/",
+      "all_versions": ["16"]
+    },
+    {
+      "codename": "flo",
+      "is_supported": true,
+      "latest_lineage_version": "17.1",
+      "maintainer": "LineageOS Community",
+      "download_url": "https://lineageos.org/devices/flo/",
+      "all_versions": ["17.1"]
+    },
+    {
+      "codename": "angler",
+      "is_supported": true,
+      "latest_lineage_version": "19.1",
+      "maintainer": "LineageOS Community",
+      "download_url": "https://lineageos.org/devices/angler/",
+      "all_versions": ["19.1", "19", "18.1", "18"]
+    },
+    {
+      "codename": "sailfish",
+      "is_supported": true,
+      "latest_lineage_version": "20",
+      "maintainer": "LineageOS Community",
+      "download_url": "https://lineageos.org/devices/sailfish/",
+      "all_versions": ["20", "19.1", "19", "18.1", "18"]
+    },
+    {
+      "codename": "marlin",
+      "is_supported": true,
+      "latest_lineage_version": "20",
+      "maintainer": "LineageOS Community",
+      "download_url": "https://lineageos.org/devices/marlin/",
+      "all_versions": ["20", "19.1", "19", "18.1", "18"]
+    },
+    {
+      "codename": "taimen",
+      "is_supported": true,
+      "latest_lineage_version": "20",
+      "maintainer": "LineageOS Community",
+      "download_url": "https://lineageos.org/devices/taimen/",
+      "all_versions": ["20", "19.1", "19", "18.1", "18"]
+    },
+    {
+      "codename": "walleye",
+      "is_supported": true,
+      "latest_lineage_version": "20",
+      "maintainer": "LineageOS Community",
+      "download_url": "https://lineageos.org/devices/walleye/",
+      "all_versions": ["20", "19.1", "19", "18.1", "18"]
+    }
+  ]
+}
