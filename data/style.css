@@ -141,6 +141,39 @@ scrolledwindow {
     background-color: #121212;
 }
 
+/* Text views */
+textview {
+    background-color: #252525;
+    color: #e0e0e0;
+    font-family: "Monospace", monospace;
+    border: 1px solid #404040;
+    padding: 10px;
+}
+
+textview:focus {
+    border-color: #4dabf7;
+    background-color: #2a2a2a;
+}
+
+/* Dialog styling */
+dialog {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+dialog > box {
+    background-color: #1a1a1a;
+    padding: 15px;
+}
+
+/* Frame for commands */
+frame {
+    border: 1px solid #404040;
+    background-color: #252525;
+    border-radius: 8px;
+    padding: 10px;
+}
+
 /* Status bar */
 statusbar {
     background-color: #1a1a1a;

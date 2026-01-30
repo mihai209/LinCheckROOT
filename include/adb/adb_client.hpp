@@ -14,6 +14,15 @@ namespace adb {
  */
 class AdbClient {
 public:
+    /**
+     * Command execution result with details
+     */
+    struct CommandResult {
+        std::string command;
+        std::string output;
+        bool success;
+    };
+
     AdbClient(const std::string& adb_path = "adb");
     ~AdbClient() = default;
 
@@ -37,6 +46,12 @@ public:
     bool reboot_bootloader() const;       // adb reboot bootloader
     bool reboot_recovery() const;         // adb reboot recovery
     bool reboot_download_mode() const;    // adb reboot download (Samsung)
+
+    // Reboot with detailed output
+    CommandResult reboot_system_detailed() const;
+    CommandResult reboot_bootloader_detailed() const;
+    CommandResult reboot_recovery_detailed() const;
+    CommandResult reboot_download_mode_detailed() const;
 
     // Validation
     bool validate_adb_path() const;

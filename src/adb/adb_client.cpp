@@ -119,33 +119,192 @@ std::string AdbClient::get_build_fingerprint() const {
 bool AdbClient::reboot_system() const {
     if (!is_device_connected()) return false;
 
-    std::string cmd = adb_path_ + " reboot";
+    std::string cmd = adb_path_ + " reboot 2>&1";
     auto result = execute_command(cmd);
-    return result.has_value();
+    
+    if (!result.has_value()) return false;
+    
+    // Check for error messages
+    std::string output = trim(result.value());
+    if (output.find("error") != std::string::npos || 
+        output.find("failed") != std::string::npos) {
+        return false;
+    }
+    
+    // Command executed, wait for device to disconnect
+    usleep(500000);  // 500ms delay
+    return true;
 }
 
 bool AdbClient::reboot_bootloader() const {
     if (!is_device_connected()) return false;
 
-    std::string cmd = adb_path_ + " reboot bootloader";
+    std::string cmd = adb_path_ + " reboot bootloader 2>&1";
     auto result = execute_command(cmd);
-    return result.has_value();
+    
+    if (!result.has_value()) return false;
+    
+    std::string output = trim(result.value());
+    if (output.find("error") != std::string::npos || 
+        output.find("failed") != std::string::npos) {
+        return false;
+    }
+    
+    usleep(500000);  // 500ms delay
+    return true;
 }
 
 bool AdbClient::reboot_recovery() const {
     if (!is_device_connected()) return false;
 
-    std::string cmd = adb_path_ + " reboot recovery";
+    std::string cmd = adb_path_ + " reboot recovery 2>&1";
     auto result = execute_command(cmd);
-    return result.has_value();
+    
+    if (!result.has_value()) return false;
+    
+    std::string output = trim(result.value());
+    if (output.find("error") != std::string::npos || 
+        output.find("failed") != std::string::npos) {
+        return false;
+    }
+    
+    usleep(500000);  // 500ms delay
+    return true;
 }
 
 bool AdbClient::reboot_download_mode() const {
     if (!is_device_connected()) return false;
 
-    std::string cmd = adb_path_ + " reboot download";
+    std::string cmd = adb_path_ + " reboot download 2>&1";
     auto result = execute_command(cmd);
-    return result.has_value();
+    
+    if (!result.has_value()) return false;
+    
+    std::string output = trim(result.value());
+    if (output.find("error") != std::string::npos || 
+        output.find("failed") != std::string::npos) {
+        return false;
+    }
+    
+    usleep(500000);  // 500ms delay
+    return true;
+}
+
+// Detailed versions that return command and output
+AdbClient::CommandResult AdbClient::reboot_system_detailed() const {
+    CommandResult result;
+    result.command = adb_path_ + " reboot";
+    
+    if (!is_device_connected()) {
+        result.output = "Error: Device not connected";
+        result.success = false;
+        return result;
+    }
+
+    std::string cmd = adb_path_ + " reboot 2>&1";
+    auto output = execute_command(cmd);
+    
+    if (!output.has_value()) {
+        result.output = "Error: Failed to execute command";
+        result.success = false;
+    } else {
+        result.output = trim(output.value());
+        result.success = result.output.find("error") == std::string::npos && 
+                        result.output.find("failed") == std::string::npos;
+        if (result.output.empty()) {
+            result.output = "Command sent successfully (no output)";
+        }
+    }
+    
+    usleep(500000);
+    return result;
+}
+
+AdbClient::CommandResult AdbClient::reboot_bootloader_detailed() const {
+    CommandResult result;
+    result.command = adb_path_ + " reboot bootloader";
+    
+    if (!is_device_connected()) {
+        result.output = "Error: Device not connected";
+        result.success = false;
+        return result;
+    }
+
+    std::string cmd = adb_path_ + " reboot bootloader 2>&1";
+    auto output = execute_command(cmd);
+    
+    if (!output.has_value()) {
+        result.output = "Error: Failed to execute command";
+        result.success = false;
+    } else {
+        result.output = trim(output.value());
+        result.success = result.output.find("error") == std::string::npos && 
+                        result.output.find("failed") == std::string::npos;
+        if (result.output.empty()) {
+            result.output = "Command sent successfully (no output)";
+        }
+    }
+    
+    usleep(500000);
+    return result;
+}
+
+AdbClient::CommandResult AdbClient::reboot_recovery_detailed() const {
+    CommandResult result;
+    result.command = adb_path_ + " reboot recovery";
+    
+    if (!is_device_connected()) {
+        result.output = "Error: Device not connected";
+        result.success = false;
+        return result;
+    }
+
+    std::string cmd = adb_path_ + " reboot recovery 2>&1";
+    auto output = execute_command(cmd);
+    
+    if (!output.has_value()) {
+        result.output = "Error: Failed to execute command";
+        result.success = false;
+    } else {
+        result.output = trim(output.value());
+        result.success = result.output.find("error") == std::string::npos && 
+                        result.output.find("failed") == std::string::npos;
+        if (result.output.empty()) {
+            result.output = "Command sent successfully (no output)";
+        }
+    }
+    
+    usleep(500000);
+    return result;
+}
+
+AdbClient::CommandResult AdbClient::reboot_download_mode_detailed() const {
+    CommandResult result;
+    result.command = adb_path_ + " reboot download";
+    
+    if (!is_device_connected()) {
+        result.output = "Error: Device not connected";
+        result.success = false;
+        return result;
+    }
+
+    std::string cmd = adb_path_ + " reboot download 2>&1";
+    auto output = execute_command(cmd);
+    
+    if (!output.has_value()) {
+        result.output = "Error: Failed to execute command";
+        result.success = false;
+    } else {
+        result.output = trim(output.value());
+        result.success = result.output.find("error") == std::string::npos && 
+                        result.output.find("failed") == std::string::npos;
+        if (result.output.empty()) {
+            result.output = "Command sent successfully (no output)";
+        }
+    }
+    
+    usleep(500000);
+    return result;
 }
 
 } // namespace adb

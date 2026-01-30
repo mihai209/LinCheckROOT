@@ -244,8 +244,18 @@ extern "C" void on_reboot_system(GtkButton* button, gpointer user_data)
     if (ui::Dialogs::confirm_reboot(GTK_WINDOW(app_state->main_window),
                                     info.type, info.description, info.warning)) {
         update_status("Rebooting system...");
-        action->execute_reboot_system();
-        update_status("Device rebooting. Please wait...");
+        
+        // Show the command to execute
+        std::string cmd = "adb reboot";
+        std::string help_msg = "Command sent! If device doesn't reboot, copy and run this in terminal:\n\n";
+        help_msg += cmd + "\n\nMake sure USB Debugging is enabled.";
+        
+        ui::Dialogs::show_command_details(GTK_WINDOW(app_state->main_window),
+                                         cmd,
+                                         help_msg,
+                                         true);
+        
+        update_status("✅ Reboot initiated...");
     }
 }
 
@@ -266,8 +276,20 @@ extern "C" void on_reboot_bootloader(GtkButton* button, gpointer user_data)
     if (ui::Dialogs::confirm_reboot(GTK_WINDOW(app_state->main_window),
                                     info.type, info.description, info.warning)) {
         update_status("Rebooting to bootloader...");
-        action->execute_reboot_bootloader();
-        update_status("Device rebooting to bootloader. Please wait...");
+        
+        std::string cmd = "adb reboot bootloader";
+        std::string help_msg = "Command sent! If device doesn't reboot, copy and run this in terminal:\n\n";
+        help_msg += cmd + "\n\nMake sure USB Debugging is enabled.";
+        if (info.warning.find("Samsung") != std::string::npos) {
+            help_msg += "\n\n⚠️  " + info.warning;
+        }
+        
+        ui::Dialogs::show_command_details(GTK_WINDOW(app_state->main_window),
+                                         cmd,
+                                         help_msg,
+                                         true);
+        
+        update_status("✅ Bootloader reboot initiated...");
     }
 }
 
@@ -288,8 +310,17 @@ extern "C" void on_reboot_recovery(GtkButton* button, gpointer user_data)
     if (ui::Dialogs::confirm_reboot(GTK_WINDOW(app_state->main_window),
                                     info.type, info.description, info.warning)) {
         update_status("Rebooting to recovery...");
-        action->execute_reboot_recovery();
-        update_status("Device rebooting to recovery. Please wait...");
+        
+        std::string cmd = "adb reboot recovery";
+        std::string help_msg = "Command sent! If device doesn't reboot, copy and run this in terminal:\n\n";
+        help_msg += cmd + "\n\nMake sure USB Debugging is enabled.";
+        
+        ui::Dialogs::show_command_details(GTK_WINDOW(app_state->main_window),
+                                         cmd,
+                                         help_msg,
+                                         true);
+        
+        update_status("✅ Recovery reboot initiated...");
     }
 }
 
@@ -310,8 +341,20 @@ extern "C" void on_reboot_download(GtkButton* button, gpointer user_data)
     if (ui::Dialogs::confirm_reboot(GTK_WINDOW(app_state->main_window),
                                     info.type, info.description, info.warning)) {
         update_status("Rebooting to Download Mode...");
-        action->execute_reboot_download();
-        update_status("Device rebooting to Download Mode. Please wait...");
+        
+        std::string cmd = "adb reboot download";
+        std::string help_msg = "Command sent! If device doesn't reboot, copy and run this in terminal:\n\n";
+        help_msg += cmd + "\n\nMake sure USB Debugging is enabled.";
+        if (!info.warning.empty()) {
+            help_msg += "\n\n⚠️  " + info.warning;
+        }
+        
+        ui::Dialogs::show_command_details(GTK_WINDOW(app_state->main_window),
+                                         cmd,
+                                         help_msg,
+                                         true);
+        
+        update_status("✅ Download Mode reboot initiated...");
     }
 }
 

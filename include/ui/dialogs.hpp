@@ -41,6 +41,14 @@ public:
                          const std::string& title,
                          const std::string& message);
 
+    /**
+     * Show command execution dialog with command details and copy button
+     */
+    static void show_command_details(GtkWindow* parent,
+                                    const std::string& command,
+                                    const std::string& output,
+                                    bool success);
+
 private:
     Dialogs() = default;
 };
