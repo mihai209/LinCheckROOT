@@ -2,15 +2,29 @@
 
 A native Linux GUI application for comprehensive analysis of Android devices connected via USB.
 
-## Features
+## ✨ Key Features
 
+### Device Analysis
 - **Device Detection**: Enumerate connected Android devices via ADB
 - **Device Information**: Extract hardware specs, Android version, kernel info
 - **Root Analysis**: Non-intrusive root detection (Magisk, SuperSU)
-- **Bootloader Status**: Check bootloader lock state (requires fastboot)
+- **Bootloader Status**: Check bootloader lock state
 - **ROM Compatibility**: Offline LineageOS compatibility check
-- **Configurable ADB Path**: Use custom ADB installation
-- **No Telemetry**: Completely local, no internet required
+- **Extended Analysis**: SELinux, Verified Boot, OEM Unlock status, A/B slots
+
+### Safe Device Actions (v2.1+)
+- **🔄 Reboot System**: Safe reboot to Android (user confirmation required)
+- **🔧 Bootloader**: Reboot to bootloader/Download Mode (Samsung-aware)
+- **⚙️ Recovery**: Reboot to recovery mode (user confirmation required)
+- **📥 Download Mode**: Samsung Download Mode (safe, no data loss)
+
+### Security & Safety
+- ✅ **Non-Destructive Only**: No flashing, no wipe, no modifications
+- ✅ **User Confirmation**: Every reboot requires explicit confirmation
+- ✅ **No Auto-Reboot**: All operations are manual
+- ✅ **Samsung Detection**: Automatic bootloader mode detection
+- ✅ **Read-Only Analysis**: All queries are safe read operations
+- ✅ **No Telemetry**: Completely local, no internet required
 
 ## Requirements
 

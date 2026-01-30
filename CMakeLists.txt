@@ -25,6 +25,13 @@ set(SOURCES
     src/rom_compatibility.cpp
     src/config_manager.cpp
     src/gui_main.cpp
+    
+    # New modular architecture
+    src/adb/adb_client.cpp
+    src/device/device_info.cpp
+    src/analyzer/analyzers.cpp
+    src/actions/reboot.cpp
+    src/ui/dialogs.cpp
 )
 
 # Create executable

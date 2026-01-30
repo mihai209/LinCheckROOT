@@ -3,6 +3,13 @@
 #include <sstream>
 #include <memory>
 
+// New modules
+#include "adb/adb_client.hpp"
+#include "device/device_info.hpp"
+#include "actions/reboot.hpp"
+#include "analyzer/analyzers.hpp"
+#include "ui/dialogs.hpp"
+
 // Suppress deprecation warnings for GTK4 compatibility
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -199,6 +206,115 @@ extern "C" void on_quit(GtkButton* button, gpointer user_data)
     gtk_window_close(GTK_WINDOW(app_state->main_window));
 }
 
+// ============ NEW CALLBACKS FOR DEVICE ACTIONS ============
+
+// Helper: Create reboot action handler
+static actions::RebootAction* get_reboot_action()
+{
+    if (!app_state) return nullptr;
+
+    // Create ADB client and device info using new modules
+    static std::unique_ptr<adb::AdbClient> adb_client;
+    static std::unique_ptr<device::DeviceInfo> device_info;
+    static std::unique_ptr<actions::RebootAction> reboot_action;
+
+    if (!adb_client) {
+        adb_client = std::make_unique<adb::AdbClient>(app_state->adb->get_adb_path());
+        device_info = std::make_unique<device::DeviceInfo>(*adb_client);
+        reboot_action = std::make_unique<actions::RebootAction>(*adb_client, *device_info);
+    }
+
+    return reboot_action.get();
+}
+
+// Callback: Reboot System
+extern "C" void on_reboot_system(GtkButton* button, gpointer user_data)
+{
+    if (!app_state) return;
+
+    auto action = get_reboot_action();
+    if (!action || !action->can_reboot()) {
+        ui::Dialogs::show_error(GTK_WINDOW(app_state->main_window),
+                               "Device Not Connected",
+                               "No device is connected. Connect an Android device with USB Debugging enabled.");
+        return;
+    }
+
+    auto info = action->get_system_reboot_info();
+    if (ui::Dialogs::confirm_reboot(GTK_WINDOW(app_state->main_window),
+                                    info.type, info.description, info.warning)) {
+        update_status("Rebooting system...");
+        action->execute_reboot_system();
+        update_status("Device rebooting. Please wait...");
+    }
+}
+
+// Callback: Reboot Bootloader
+extern "C" void on_reboot_bootloader(GtkButton* button, gpointer user_data)
+{
+    if (!app_state) return;
+
+    auto action = get_reboot_action();
+    if (!action || !action->can_reboot()) {
+        ui::Dialogs::show_error(GTK_WINDOW(app_state->main_window),
+                               "Device Not Connected",
+                               "No device is connected. Connect an Android device with USB Debugging enabled.");
+        return;
+    }
+
+    auto info = action->get_bootloader_reboot_info();
+    if (ui::Dialogs::confirm_reboot(GTK_WINDOW(app_state->main_window),
+                                    info.type, info.description, info.warning)) {
+        update_status("Rebooting to bootloader...");
+        action->execute_reboot_bootloader();
+        update_status("Device rebooting to bootloader. Please wait...");
+    }
+}
+
+// Callback: Reboot Recovery
+extern "C" void on_reboot_recovery(GtkButton* button, gpointer user_data)
+{
+    if (!app_state) return;
+
+    auto action = get_reboot_action();
+    if (!action || !action->can_reboot()) {
+        ui::Dialogs::show_error(GTK_WINDOW(app_state->main_window),
+                               "Device Not Connected",
+                               "No device is connected. Connect an Android device with USB Debugging enabled.");
+        return;
+    }
+
+    auto info = action->get_recovery_reboot_info();
+    if (ui::Dialogs::confirm_reboot(GTK_WINDOW(app_state->main_window),
+                                    info.type, info.description, info.warning)) {
+        update_status("Rebooting to recovery...");
+        action->execute_reboot_recovery();
+        update_status("Device rebooting to recovery. Please wait...");
+    }
+}
+
+// Callback: Reboot Download Mode (Samsung)
+extern "C" void on_reboot_download(GtkButton* button, gpointer user_data)
+{
+    if (!app_state) return;
+
+    auto action = get_reboot_action();
+    if (!action || !action->can_reboot()) {
+        ui::Dialogs::show_error(GTK_WINDOW(app_state->main_window),
+                               "Device Not Connected",
+                               "No device is connected. Connect an Android device with USB Debugging enabled.");
+        return;
+    }
+
+    auto info = action->get_download_reboot_info();
+    if (ui::Dialogs::confirm_reboot(GTK_WINDOW(app_state->main_window),
+                                    info.type, info.description, info.warning)) {
+        update_status("Rebooting to Download Mode...");
+        action->execute_reboot_download();
+        update_status("Device rebooting to Download Mode. Please wait...");
+    }
+}
+
 // Load and apply CSS styling
 static void apply_custom_css(GtkApplication* app)
 {
@@ -308,6 +424,48 @@ static GtkWidget* build_gui(GtkApplication* app)
 
     gtk_box_append(GTK_BOX(control_panel), device_row);
     gtk_box_append(GTK_BOX(main_box), control_panel);
+
+    // Device Actions section
+    GtkWidget* device_actions_label = gtk_label_new("");
+    gtk_label_set_markup(GTK_LABEL(device_actions_label), "<b>📱 Device Actions (Safe Reboot Only)</b>");
+    gtk_label_set_xalign(GTK_LABEL(device_actions_label), 0.0);
+    gtk_widget_set_margin_start(device_actions_label, 15);
+    gtk_widget_set_margin_top(device_actions_label, 12);
+    gtk_box_append(GTK_BOX(main_box), device_actions_label);
+
+    GtkWidget* reboot_buttons_row = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+    gtk_widget_set_margin_start(reboot_buttons_row, 15);
+    gtk_widget_set_margin_end(reboot_buttons_row, 15);
+    gtk_widget_set_margin_bottom(reboot_buttons_row, 12);
+
+    GtkWidget* reboot_system_btn = gtk_button_new_with_label("🔄 Reboot System");
+    gtk_widget_set_size_request(reboot_system_btn, 150, -1);
+    g_signal_connect(reboot_system_btn, "clicked", G_CALLBACK(on_reboot_system), nullptr);
+    gtk_box_append(GTK_BOX(reboot_buttons_row), reboot_system_btn);
+
+    GtkWidget* reboot_bootloader_btn = gtk_button_new_with_label("🔧 Bootloader");
+    gtk_widget_set_size_request(reboot_bootloader_btn, 150, -1);
+    g_signal_connect(reboot_bootloader_btn, "clicked", G_CALLBACK(on_reboot_bootloader), nullptr);
+    gtk_box_append(GTK_BOX(reboot_buttons_row), reboot_bootloader_btn);
+
+    GtkWidget* reboot_recovery_btn = gtk_button_new_with_label("⚙️ Recovery");
+    gtk_widget_set_size_request(reboot_recovery_btn, 150, -1);
+    g_signal_connect(reboot_recovery_btn, "clicked", G_CALLBACK(on_reboot_recovery), nullptr);
+    gtk_box_append(GTK_BOX(reboot_buttons_row), reboot_recovery_btn);
+
+    GtkWidget* reboot_download_btn = gtk_button_new_with_label("📥 Download Mode");
+    gtk_widget_set_size_request(reboot_download_btn, 150, -1);
+    g_signal_connect(reboot_download_btn, "clicked", G_CALLBACK(on_reboot_download), nullptr);
+    gtk_box_append(GTK_BOX(reboot_buttons_row), reboot_download_btn);
+
+    gtk_box_append(GTK_BOX(main_box), reboot_buttons_row);
+
+    GtkWidget* warning_label = gtk_label_new("⚠️  All reboots require confirmation. No data will be erased.");
+    gtk_label_set_xalign(GTK_LABEL(warning_label), 0.0);
+    gtk_widget_set_margin_start(warning_label, 15);
+    gtk_widget_set_margin_end(warning_label, 15);
+    gtk_widget_set_margin_bottom(warning_label, 12);
+    gtk_box_append(GTK_BOX(main_box), warning_label);
 
     // Action buttons
     GtkWidget* button_row = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
